@@ -2,13 +2,33 @@ require('dotenv').config();
 const { MongoClient } = require('mongodb');
 const TelegramBot = require('node-telegram-bot-api');
 const cron = require('node-cron');
+const express = require('express');
 
 const uri = process.env.MONGODB_URI;
 const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const chatId = process.env.CHAT_ID;
+const PORT = process.env.PORT || 3000;
 
-// Initialize bot
-const bot = new TelegramBot(botToken);
+// Initialize Express app
+const app = express();
+app.use(express.json());
+
+// Initialize bot with webhook mode for Vercel
+let bot;
+if (process.env.NODE_ENV === 'production') {
+  // Webhook mode for production (Vercel)
+  const webhookUrl = process.env.VERCEL_URL || process.env.WEBHOOK_URL;
+  bot = new TelegramBot(botToken, {
+    webHook: {
+      port: PORT
+    }
+  });
+  // Set webhook path
+  bot.setWebHook(`${webhookUrl}/bot${botToken}`);
+} else {
+  // Polling mode for development
+  bot = new TelegramBot(botToken, { polling: true });
+}
 
 async function getDateRangeForYesterday() {
   const today = new Date();
@@ -631,7 +651,38 @@ bot.onText(/\/(stats|start|getchatid|newusers)/, async (msg) => {
   }
 });
 
-// Start bot and test connection
-testConnection();
-bot.startPolling();
-console.log('Bot is running...');
+// Express routes for webhook
+app.post(`/bot${botToken}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
+
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.status(200).send('Bot is running!');
+});
+
+// Endpoint to manually trigger stats
+app.get('/api/stats', async (req, res) => {
+  try {
+    const statsMessage = await getStats();
+    res.status(200).json({ success: true, stats: statsMessage });
+  } catch (error) {
+    console.error('Error generating stats:', error);
+    res.status(500).json({ success: false, error: 'Failed to generate stats' });
+  }
+});
+
+// Start Express server
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    testConnection();
+  });
+} else {
+  // In production, we don't need to start the server as Vercel handles that
+  console.log('Bot is running in production mode');
+}
+
+// Export the Express app for Vercel
+module.exports = app;

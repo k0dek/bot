@@ -1,6 +1,6 @@
 # SaaS Statistics Bot
 
-A comprehensive Telegram bot for monitoring and reporting SaaS platform statistics with real-time insights and daily activity tracking.
+A comprehensive Telegram bot for monitoring and reporting SaaS platform statistics with real-time insights and daily activity tracking. Optimized for deployment on Vercel.
 
 ## Features
 
@@ -25,7 +25,7 @@ A comprehensive Telegram bot for monitoring and reporting SaaS platform statisti
 - MongoDB database
 - Telegram Bot Token
 
-### Setup
+### Local Setup
 
 1. **Clone the repository**
    ```bash
@@ -39,17 +39,48 @@ A comprehensive Telegram bot for monitoring and reporting SaaS platform statisti
    ```
 
 3. **Configure environment variables**
-   Create a `.env` file with:
-   ```env
-   TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-   MONGODB_URI=your_mongodb_connection_string
-   CHAT_ID=your_telegram_chat_id
+   Create a `.env` file based on the `.env.example` template:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit the `.env` file with your actual values.
+
+4. **Run the bot locally**
+   ```bash
+   npm run dev
    ```
 
-4. **Run the bot**
+## Deployment to Vercel
+
+### Setup
+
+1. **Install Vercel CLI** (optional)
    ```bash
-   node bot.js
+   npm install -g vercel
    ```
+
+2. **Deploy to Vercel**
+   ```bash
+   vercel
+   ```
+   Or connect your GitHub repository to Vercel for automatic deployments.
+
+3. **Set Environment Variables**
+   In the Vercel dashboard, add the following environment variables:
+   - `TELEGRAM_BOT_TOKEN`: Your Telegram bot token
+   - `MONGODB_URI`: Your MongoDB connection string
+   - `CHAT_ID`: Your Telegram chat ID
+   - `NODE_ENV`: Set to `production`
+   - `WEBHOOK_URL`: Your Vercel deployment URL (if not using `VERCEL_URL`)
+
+4. **Set up Telegram Webhook**
+   After deployment, your bot will automatically set up the webhook using the Vercel deployment URL.
+
+### API Endpoints
+
+- **`/`**: Health check endpoint
+- **`/api/stats`**: Manually trigger and view statistics
+- **`/bot<token>`**: Webhook endpoint for Telegram (automatically configured)
 
 ## Database Schema Support
 
@@ -94,6 +125,13 @@ The bot automatically sends daily statistics reports at 9:00 AM using cron sched
 - Graceful fallbacks for missing database fields
 - Detailed logging for debugging and monitoring
 - Clean error messages for end users
+
+## Project Structure
+
+- `bot.js`: Main application file with bot logic and Express server
+- `vercel.json`: Vercel deployment configuration
+- `.env.example`: Template for environment variables
+- `package.json`: Project dependencies and scripts
 
 ## Contributing
 

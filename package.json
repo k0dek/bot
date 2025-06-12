@@ -4,12 +4,21 @@
   "description": "A Telegram bot that sends daily SaaS statistics",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "dev": "nodemon bot.js",
+    "vercel-build": "echo 'Building for Vercel'"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "mongodb": "^6.3.0",
     "node-telegram-bot-api": "^0.64.0",
     "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
