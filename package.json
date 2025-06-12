@@ -1,0 +1,15 @@
+{
+  "name": "saas-stats-bot",
+  "version": "1.0.0",
+  "description": "A Telegram bot that sends daily SaaS statistics",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "mongodb": "^6.3.0",
+    "node-telegram-bot-api": "^0.64.0",
+    "node-cron": "^3.0.3"
+  }
+}
